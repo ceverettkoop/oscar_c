@@ -1,6 +1,4 @@
 //boilerplate from https://github.com/RnDome/bwapi-c/blob/master/example/Client.c
-// mingw on linux: i686-w64-mingw32-gcc -mabi=ms -o Client.exe Client.c -I../include -L. -lBWAPIC
-// gcc   on linux: you can't connect to BW using client, because openbw/bwapi v4.1.12 does not support it :(
 
 #ifdef _WIN32
     #include <windows.h>
@@ -49,6 +47,7 @@ int main() {
     Game_sendText(BWGame, "The map is '%s'!", BwString_data(map_name));
     BwString_release(map_name);
 
+//replay handling
     if (Game_isReplay(BWGame)) {
         Game_sendText(BWGame, "The following players are in this replay:");
         Iterator* const players = (Iterator*) Game_getPlayers(BWGame);
@@ -69,8 +68,8 @@ int main() {
         Iterator_release(players);
     }
 
-    while(Game_isInGame(BWGame))
-    {
+//main loop
+    while(Game_isInGame(BWGame)){
         const Position text_position = { .x = 300, .y = 0 };
         Game_drawTextScreen(BWGame, text_position, "FPS: %f", Game_getAverageFPS(BWGame));
 

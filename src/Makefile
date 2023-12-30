@@ -6,7 +6,7 @@ CPPFLAGS=-I$(IDIR)
 
 ODIR=obj
 IDIR =../include
-LDFLAGS=-L../lib
+LDFLAGS=-L../bin
 LDLIBS=-lBWAPIC
 
 DEPDIR := .deps
@@ -38,8 +38,3 @@ include $(wildcard $(DEPFILES))
 
 clean:
 	rm -f $(ODIR)/*.o
-
-.PHONY: install
-
-install:
-	cp  ../bin/$(BINNAME) ./starcraft/bwapi-data/$(BINNAME)
