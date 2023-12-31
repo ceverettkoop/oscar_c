@@ -73,6 +73,15 @@ int main() {
         const Position text_position = { .x = 300, .y = 0 };
         Game_drawTextScreen(BWGame, text_position, "FPS: %f", Game_getAverageFPS(BWGame));
 
+        //export gamestate to z80
+        
+        //await instructions from z80 or timeout
+        
+        //on receive instructions, execute them
+        
+        //if timeout, tell z80
+
+        //advance frame
         Client_update(BWClient);
         reconnect();
     }
