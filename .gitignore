@@ -1,6 +1,7 @@
 /starcraft/*
 /bwapi-c/*
-/lib/*
+/bin/*
+
 
 .DS_Store
 bin/Oscar_client.exe

@@ -6,7 +6,7 @@ CPPFLAGS=-I$(IDIR)
 
 ODIR=obj
 IDIR =../include
-LDFLAGS=-L../bin
+LDFLAGS=-L../lib
 LDLIBS=-lBWAPIC
 
 DEPDIR := .deps
@@ -18,14 +18,14 @@ _OBJ=main.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-BINNAME=Oscar_client.exe
+BINNAME=Oscar_c_d.dll
 
 #$(LDFLAGS) $(LDLIBS)
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o$@ $< $(CFLAGS)
 
 mybot:$(OBJ)
-	$(CC) -o../bin/$(BINNAME) $(OBJ) $(CFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CC) -shared -o../bin/$(BINNAME) $(OBJ) $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 
 $(DEPDIR): ; @mkdir -p $@
 
@@ -38,3 +38,6 @@ include $(wildcard $(DEPFILES))
 
 clean:
 	rm -f $(ODIR)/*.o
+
+install:
+	cp ../bin/$(BINNAME) ../starcraft/bwapi-data/
