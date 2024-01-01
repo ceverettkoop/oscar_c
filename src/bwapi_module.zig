@@ -1,21 +1,7 @@
 //imports for human added code
 const std = @import("std");
+const oscar = @import("oscar.zig");
 const win = std.os.windows;
-
-//dll export defines
-const WINAPI = win.WINAPI;
-const HINSTANCE = win.HINSTANCE;
-const DWORD = win.DWORD;
-const LPVOID = win.LPVOID;
-const BOOL = win.BOOL;
-const HWND = win.HWND;
-const LPCSTR = win.LPCSTR;
-const UINT = win.UINT;
-
-const DLL_PROCESS_ATTACH: DWORD = 1;
-const DLL_THREAD_ATTACH: DWORD = 2;
-const DLL_THREAD_DETACH: DWORD = 3;
-const DLL_PROCESS_DETACH: DWORD = 0;
 
 pub const __builtin_bswap16 = @import("std").zig.c_builtins.__builtin_bswap16;
 pub const __builtin_bswap32 = @import("std").zig.c_builtins.__builtin_bswap32;
@@ -236,6 +222,23 @@ pub const struct_AIModule_vtable = extern struct {
 };
 pub extern fn createAIModuleWrapper(module: [*c]AIModule) ?*anyopaque;
 pub extern fn destroyAIModuleWrapper(module: ?*anyopaque) void;
+pub extern fn Bullet_getID(self: ?*Bullet) c_int;
+pub extern fn Bullet_exists(self: ?*Bullet) bool;
+pub extern fn Bullet_getPlayer(self: ?*Bullet) ?*Player;
+pub extern fn Bullet_getType(self: ?*Bullet) BulletType;
+pub extern fn Bullet_getSource(self: ?*Bullet) ?*Unit;
+pub extern fn Bullet_getPosition(self: ?*Bullet) Position;
+pub extern fn Bullet_getAngle(self: ?*Bullet) f64;
+pub extern fn Bullet_getVelocityX(self: ?*Bullet) f64;
+pub extern fn Bullet_getVelocityY(self: ?*Bullet) f64;
+pub extern fn Bullet_getTarget(self: ?*Bullet) ?*Unit;
+pub extern fn Bullet_getTargetPosition(self: ?*Bullet) Position;
+pub extern fn Bullet_getRemoveTimer(self: ?*Bullet) c_int;
+pub extern fn Bullet_isVisible(self: ?*Bullet, player: ?*Player) bool;
+pub extern fn Bullet_registerEvent(self: ?*Bullet, action: ?*const fn (?*Bullet) callconv(.C) void, condition: ?*const fn (?*Bullet) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Force_getID(self: ?*Force) c_int;
+pub extern fn Force_getName(self: ?*Force) ?*BwString;
+pub extern fn Force_getPlayers(self: ?*Force) ?*PlayerIterator;
 pub const __builtin_va_list = [*c]u8;
 pub const __gnuc_va_list = __builtin_va_list;
 pub const va_list = __builtin_va_list;
@@ -724,6 +727,22 @@ pub extern fn Player_isResearchAvailable(self: ?*Player, tech: TechType) bool;
 pub extern fn Player_isUnitAvailable(self: ?*Player, unit: UnitType) bool;
 pub extern fn Player_hasUnitTypeRequirement(self: ?*Player, unit: UnitType, amount: c_int) bool;
 pub extern fn Player_registerEvent(self: ?*Player, action: ?*const fn (?*Player) callconv(.C) void, condition: ?*const fn (?*Player) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Region_getID(self: ?*Region) c_int;
+pub extern fn Region_getRegionGroupID(self: ?*Region) c_int;
+pub extern fn Region_getCenter(self: ?*Region) Position;
+pub extern fn Region_isHigherGround(self: ?*Region) bool;
+pub extern fn Region_getDefensePriority(self: ?*Region) c_int;
+pub extern fn Region_isAccessible(self: ?*Region) bool;
+pub extern fn Region_getNeighbors(self: ?*Region) ?*RegionIterator;
+pub extern fn Region_getBoundsLeft(self: ?*Region) c_int;
+pub extern fn Region_getBoundsTop(self: ?*Region) c_int;
+pub extern fn Region_getBoundsRight(self: ?*Region) c_int;
+pub extern fn Region_getBoundsBottom(self: ?*Region) c_int;
+pub extern fn Region_getClosestAccessibleRegion(self: ?*Region) ?*Region;
+pub extern fn Region_getClosestInaccessibleRegion(self: ?*Region) ?*Region;
+pub extern fn Region_getDistance(self: ?*Region, other: ?*Region) c_int;
+pub extern fn Region_getUnits(self: ?*Region, pred: UnaryUnitFilter) ?*UnitIterator;
+pub extern fn Region_registerEvent(self: ?*Region, action: ?*const fn (?*Region) callconv(.C) void, condition: ?*const fn (?*Region) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn BwString_new(data: [*c]const u8, len: c_int) ?*BwString;
 pub extern fn BwString_data(self: ?*const BwString) [*c]const u8;
 pub extern fn BwString_len(self: ?*const BwString) c_int;
@@ -752,15 +771,16 @@ pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
     _ = @TypeOf(isWinner);
     Game_sendText(Broodwar, "Game ended");
 }
+
+
 pub export fn onFrame(arg_self: [*c]AIModule) void {
     var self = arg_self;
     _ = @TypeOf(self);
-    const frame_count: c_int = Game_getFrameCount(Broodwar);
-    var CoordinateType_None: CoordinateType = CoordinateType{
-        .id = @as(c_int, 0),
-    };
-    Game_drawText(Broodwar, CoordinateType_None, @as(c_int, 10), @as(c_int, 10), "Frame %d", frame_count);
+    //actual zig bot here, pass it the game pointer
+    oscar.onFrame(Broodwar);
 }
+
+
 pub export fn onSendText(arg_module: [*c]AIModule, arg_text: [*c]const u8) void {
     var module = arg_module;
     _ = @TypeOf(module);

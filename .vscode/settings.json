@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "aimodule.h": "c",
+        "game.h": "c"
+    }
+}

@@ -1,6 +1,4 @@
-/starcraft/*
-/bwapi-c/*
-/zig-cache/*
-/zig-out/*
-/src/obj/*
+/starcraft/**
+/zig-cache/**
+/zig-out/**
 .DS_Store
