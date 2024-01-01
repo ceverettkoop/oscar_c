@@ -874,7 +874,7 @@ pub export fn gameInit(arg_game: ?*BWAPI_Game) void {
 pub export fn newAIModule() ?*BWAPI_AIModule {
     const allocator = std.heap.page_allocator;
     const module: [*c]OscarModule = allocator.create(OscarModule) catch 0;
-    module.*.name = "OscarModule";
+    module.*.name = "oscar_z";
     module.*.vtable_ = &module_vtable;
     return @as(?*BWAPI_AIModule, @ptrCast(createAIModuleWrapper(@as([*c]AIModule, @ptrCast(@alignCast(module))))));
 }
