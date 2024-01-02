@@ -36,7 +36,7 @@ pub export fn onStart(arg_self: [*c]AIModule) void {
     gs_ptr.*.init(allocator, Broodwar);
 
     //cry if not zerg
-    if(gs_ptr.*.self_race != bw.Race.Zerg){
+    if(gs_ptr.*.self_race != @intFromEnum(bw.Race.Zerg) ){
         Game_sendText(Broodwar, "I am not zerg so no clue :(");
     }
 
