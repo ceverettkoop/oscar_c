@@ -34,7 +34,7 @@ pub fn gatherEvents(event_list: ?*ArrayList(UnitEvent), Broodwar: ?*bwapi.Game) 
     var event_it: *bwapi.Iterator = @ptrCast(bwapi.Game_getEvents(Broodwar).? ) ;
 
     while(bwapi.Iterator_valid(event_it)){
-        const aligned_ptr: *align(4)anyopaque = @alignCast(bwapi.Iterator_get(event_it).?);
+        const aligned_ptr: *align(@alignOf(*bwapi.Event))anyopaque = @alignCast(bwapi.Iterator_get(event_it).?);
         const event: *bwapi.Event = @ptrCast(aligned_ptr);
         const event_type: EventType = @enumFromInt(event.type.id);
         var unit_related: bool = switch (event_type) {
@@ -45,7 +45,10 @@ pub fn gatherEvents(event_list: ?*ArrayList(UnitEvent), Broodwar: ?*bwapi.Game) 
             else => false,
         };
         //ignore events not pertaining to unit
-        if (!unit_related) continue;
+        if (!unit_related){
+            bwapi.Iterator_next(event_it);
+            continue;
+        }
         const new_event: UnitEvent = .{.type = @as(EventType, event_type)
             , .unit_id = bwapi.Unit_getID(event.unit)};
         const event_ptr = event_list.?;

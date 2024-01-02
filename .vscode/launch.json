@@ -4,15 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "wine",
-            "args": ["RunStarcraftWithBWAPI.bat"],
+            "program": "${workspaceFolder}/starcraft/BWAPILauncher",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/starcraft",
-            "environment": [],
+            "envFile": "${workspaceFolder}/.env",
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
