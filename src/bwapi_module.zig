@@ -1,7 +1,66 @@
 //imports for human added code
 const std = @import("std");
 const oscar = @import("oscar.zig");
+const GameState = @import("GameState.zig");
 const win = std.os.windows;
+const bw = @import("bwenums.zig");
+var GPA = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = GPA.allocator();
+
+//only global ideally
+var game_state: ?*GameState = null;
+
+pub export fn gameInit(arg_game: ?*BWAPI_Game) void {
+    var game = arg_game;
+    Broodwar = @as(?*Game, @ptrCast(game));
+    BWAPIC_setGame(Broodwar);
+}
+pub export fn newAIModule() ?*BWAPI_AIModule {
+    const module: [*c]OscarModule = allocator.create(OscarModule) catch 0;
+    module.*.name = "oscar";
+    module.*.vtable_ = &module_vtable;
+    return @as(?*BWAPI_AIModule, @ptrCast(createAIModuleWrapper(@as([*c]AIModule, @ptrCast(@alignCast(module))))));
+}
+
+pub export fn onStart(arg_self: [*c]AIModule) void {
+    //module stuff
+    var self = arg_self;
+    var module: [*c]OscarModule = @as([*c]OscarModule, @ptrCast(@alignCast(self)));
+    Game_sendText(Broodwar, "Hello from zig!");
+    Game_sendText(Broodwar, "My name is %s", module.*.name);
+    //end module
+    
+    //allocate gamestate
+    game_state = allocator.create(GameState) catch null; //hack bc interfaces w c
+    const gs_ptr: *GameState = game_state.?;
+    gs_ptr.*.init(allocator, Broodwar);
+
+    //cry if not zerg
+    if(gs_ptr.*.self_race != bw.Race.Zerg){
+        Game_sendText(Broodwar, "I am not zerg so no clue :(");
+    }
+
+}
+
+pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
+    var module = arg_module;
+    _ = @TypeOf(module);
+    var isWinner = arg_isWinner;
+    _ = @TypeOf(isWinner);
+    Game_sendText(Broodwar, "Game ended");
+    const gs_ptr: *GameState = game_state.?;
+    gs_ptr.*.deinit();
+}
+
+pub export fn onFrame(arg_self: [*c]AIModule) void {
+    var self = arg_self;
+    _ = @TypeOf(self);
+    //actual bot here, pass it the game pointer along with allocator
+    oscar.onFrame(Broodwar, allocator);
+}
+
+
+//END HUMAN WRITTEN CODE
 
 pub const __builtin_bswap16 = @import("std").zig.c_builtins.__builtin_bswap16;
 pub const __builtin_bswap32 = @import("std").zig.c_builtins.__builtin_bswap32;
@@ -758,28 +817,6 @@ pub const struct_OscarModule_tag = extern struct {
     name: [*c]const u8,
 };
 pub const OscarModule = struct_OscarModule_tag;
-pub export fn onStart(arg_self: [*c]AIModule) void {
-    var self = arg_self;
-    var module: [*c]OscarModule = @as([*c]OscarModule, @ptrCast(@alignCast(self)));
-    Game_sendText(Broodwar, "Hello from bwapi-c!");
-    Game_sendText(Broodwar, "My name is %s", module.*.name);
-}
-pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
-    var module = arg_module;
-    _ = @TypeOf(module);
-    var isWinner = arg_isWinner;
-    _ = @TypeOf(isWinner);
-    Game_sendText(Broodwar, "Game ended");
-}
-
-
-pub export fn onFrame(arg_self: [*c]AIModule) void {
-    var self = arg_self;
-    _ = @TypeOf(self);
-    //actual zig bot here, pass it the game pointer
-    oscar.onFrame(Broodwar);
-}
-
 
 pub export fn onSendText(arg_module: [*c]AIModule, arg_text: [*c]const u8) void {
     var module = arg_module;
@@ -886,18 +923,6 @@ pub var module_vtable: AIModule_vtable = AIModule_vtable{
     .onSaveGame = &onSaveGame,
     .onUnitComplete = &onUnitComplete,
 };
-pub export fn gameInit(arg_game: ?*BWAPI_Game) void {
-    var game = arg_game;
-    Broodwar = @as(?*Game, @ptrCast(game));
-    BWAPIC_setGame(Broodwar);
-}
-pub export fn newAIModule() ?*BWAPI_AIModule {
-    const allocator = std.heap.page_allocator;
-    const module: [*c]OscarModule = allocator.create(OscarModule) catch 0;
-    module.*.name = "oscar";
-    module.*.vtable_ = &module_vtable;
-    return @as(?*BWAPI_AIModule, @ptrCast(createAIModuleWrapper(@as([*c]AIModule, @ptrCast(@alignCast(module))))));
-}
 
 pub const __INTMAX_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `LL`"); // (no file):75:9
 pub const __UINTMAX_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `ULL`"); // (no file):81:9
