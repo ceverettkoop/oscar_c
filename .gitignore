@@ -2,3 +2,4 @@ starcraft/**
 zig-cache/**
 zig-out/**
 .DS_Store
+lib/*.so
