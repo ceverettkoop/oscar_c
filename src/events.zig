@@ -44,7 +44,7 @@ pub fn gatherEvents(event_list: ?*ArrayList(UnitEvent), Broodwar: ?*bwapi.Game) 
                 => true,
             else => false,
         };
-        //ignore events not pertaining to unit
+        //early exit
         if (!unit_related){
             bwapi.Iterator_next(event_it);
             continue;
