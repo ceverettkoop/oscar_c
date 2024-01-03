@@ -56,7 +56,7 @@ pub export fn onFrame(arg_self: [*c]AIModule) void {
     var self = arg_self;
     _ = @TypeOf(self);
     //actual bot here, pass it the game pointer along with allocator
-    oscar.onFrame(Broodwar, allocator);
+    oscar.onFrame(Broodwar, allocator, game_state);
 }
 
 

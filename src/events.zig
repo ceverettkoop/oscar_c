@@ -2,7 +2,7 @@ const std = @import("std");
 const ArrayList = std.ArrayList;
 const bwapi = @import("bwapi_module.zig");
 
-const EventType = enum(c_int) {
+pub const EventType = enum(c_int) {
     MatchStart,
     MatchEnd,
     MatchFrame,
