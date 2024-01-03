@@ -5,20 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) Launch MAC",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/starcraft/BWAPILauncher",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/starcraft",
-            "envFile": "${workspaceFolder}/.env",
+            "envFile": "${workspaceFolder}/.mac.env",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
         },
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) Launch LINUX",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/starcraft/BWAPILauncher",
@@ -42,7 +42,4 @@
             ]
         }
         ]
-    }
-
-    ]
 }
