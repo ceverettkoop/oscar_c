@@ -3,6 +3,9 @@ const GameState = @This();
 const bwapi = @import("bwapi_module.zig");
 const bw = @import("bwenums.zig");
 const events = @import("events.zig");
+const BWAPIError = error{
+    UnitNotFound,
+};
 
 //members
 unit_list: std.ArrayList(UnitRecord),
@@ -47,25 +50,33 @@ pub fn updateGameStateFromEvents(self: *GameState,
     for (new_events.items) |event| {
         switch (event.type) {
             //have to handle unit registration failure here so not passed up to toframe
-            EventType.UnitCreate => registerNewUnit(self, event, Broodwar),
+            EventType.UnitCreate => registerNewUnit(self, event, Broodwar) catch |err|{
+                if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
+            },
             else => continue,
         }
     }
 
 }
 
-//called if/when we are sure a unit is new to us
+//called once we are sure a unit is new to us
 fn registerNewUnit(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void{
-    //todo throw more expressive error, but this will just abort registration
-    const unit_ptr = try bwapi.Game_getUnit(Broodwar, event.unit_id);
-    const unit_owner = try bwapi.Unit_getPlayer(unit_ptr);
-
-    const new_unit: UnitRecord = .{
-        .id = event.unit_id,
-        .type = @enumFromInt(bwapi.Unit_getType(unit_ptr).id),
-        .is_friendly = (bwapi.Player_getID(unit_owner) == self.self_player_id),
-        .role = UnitRole.UNKNOWN,
-        .role_verified = false,
-    };
-    self.unit_list.append(new_unit);
+    //check if unit is found by id
+    const unit_ptr = bwapi.Game_getUnit(Broodwar, event.unit_id);
+    if (unit_ptr) |u_ptr_val|{
+        //failure to find player owning valid unit = crash
+        const unit_owner = bwapi.Unit_getPlayer(u_ptr_val) orelse unreachable;
+        //create and append record
+        const new_unit: UnitRecord = .{
+            .id = event.unit_id,
+            .type = @enumFromInt(bwapi.Unit_getType(unit_ptr).id),
+            .is_friendly = (bwapi.Player_getID(unit_owner) == self.self_player_id),
+            .role = UnitRole.UNKNOWN,
+            .role_verified = false,
+        };
+        try self.unit_list.append(new_unit);
+    }else{
+        //handle null unit ptr
+        return BWAPIError.UnitNotFound;
+    }
 }
