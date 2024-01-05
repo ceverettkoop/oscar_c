@@ -53,10 +53,12 @@ pub fn updateGameStateFromEvents(self: *GameState,
             EventType.UnitCreate => registerNewUnit(self, event, Broodwar) catch |err|{
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
             },
+            EventType.UnitDiscover => registerNewUnit(self, event, Broodwar) catch |err|{
+                if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
+            },
             else => continue,
         }
     }
-
 }
 
 //called once we are sure a unit is new to us

@@ -1,4 +1,5 @@
-//imports for human added code
+//human written/readable functions at top, followed by auto generated C to zig mapping 
+
 const std = @import("std");
 const oscar = @import("oscar.zig");
 const GameState = @import("GameState.zig");
