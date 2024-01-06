@@ -7,17 +7,31 @@ const GameState = @import("GameState.zig");
 pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state: ?*GameState) void {
     const state_ptr: *GameState = game_state orelse unreachable;
     
-    //start timer
+    //timer/interrupt? if we get longer execution times
 
     //debug
     drawDebugInfo(Broodwar);
 
     //gather events
     var new_events = std.ArrayList(events.UnitEvent).init(allocator);
-    defer new_events.deinit();
+        defer new_events.deinit();
     events.gatherEvents(&new_events, Broodwar) catch unreachable;
+
     //update gamestate
     state_ptr.updateGameStateFromEvents(new_events, Broodwar);
+    //state_ptr.identify_battles(Broodwar)
+
+    //update priorities based on gamestate
+
+    //priority list = get priorities from gamestate
+
+
+    //issue commands based on priority
+    //commands to issue = priorities + gamestate
+
+    //execute commands
+
+
 }
 
 fn drawDebugInfo(Broodwar: ?*bwapi.Game) void {
