@@ -5,10 +5,11 @@ const bw = @import("bwenums.zig");
 const events = @import("events.zig");
 const BWAPIError = error{
     UnitNotFound,
+    UnitRecordNotFound
 };
 
 //members
-unit_list: std.ArrayList(UnitRecord),
+unit_list: std.AutoHashMap(c_int, UnitRecord),
 self_player_id: c_int,
 self_race: c_int,
 enemy_race: c_int,
@@ -32,7 +33,7 @@ const UnitRecord = struct {
 
 pub fn init(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) void {
     //allocations
-    self.unit_list = std.ArrayList(UnitRecord).init(allocator);
+    self.unit_list = std.AutoHashMap(c_int, UnitRecord).init(allocator);
     //determine races
     const me = bwapi.Game_self(Broodwar);
     const enemy = bwapi.Game_enemy(Broodwar);
@@ -56,6 +57,13 @@ pub fn updateGameStateFromEvents(self: *GameState,
             EventType.UnitDiscover => registerNewUnit(self, event, Broodwar) catch |err|{
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
             },
+            EventType.UnitMorph => updateUnitType(self, event, Broodwar) catch |err|{
+                if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on morph\n", .{});
+                if (err == BWAPIError.UnitRecordNotFound) std.debug.print("UnitRecordNotFound on morph\n", .{});
+            },
+            EventType.UnitDestroy => rmUnit(self, event) catch |err|{
+                if (err == BWAPIError.UnitRecordNotFound) std.debug.print("UnRecordNotFound on remove\n", .{});
+            },
             else => continue,
         }
     }
@@ -76,9 +84,27 @@ fn registerNewUnit(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.
             .role = UnitRole.UNKNOWN,
             .role_verified = false,
         };
-        try self.unit_list.append(new_unit);
+        try self.unit_list.put(new_unit.id, new_unit);
     }else{
         //handle null unit ptr
         return BWAPIError.UnitNotFound;
     }
+}
+
+//only applicable for morph? updates type on unit per event
+fn updateUnitType(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void{
+    //check if unit is found by id
+    const unit_ptr = bwapi.Game_getUnit(Broodwar, event.unit_id);
+    if (unit_ptr)|u_ptr_val|{
+        const record = self.unit_list.getPtr(event.unit_id) orelse return BWAPIError.UnitRecordNotFound;
+        record.type = @enumFromInt(bwapi.Unit_getType(u_ptr_val).id);
+    }else{
+        return BWAPIError.UnitNotFound;
+    }
+}
+
+fn rmUnit(self: *GameState, event: events.UnitEvent) !void{
+    //check if unit is found by id and remove
+    const removed = self.unit_list.remove(event.unit_id);
+    if (!removed) return BWAPIError.UnitRecordNotFound;
 }
