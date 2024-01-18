@@ -521,7 +521,7 @@ pub const Orders = enum(c_int){
     MAX
 };
 
-pub const UnitCommandTypes = enum(c_int){
+pub const UnitCommandType = enum(c_int){
     Attack_Move = 0,
     Attack_Unit,
     Build,
@@ -626,4 +626,26 @@ pub const UpgradeTypes = enum(c_int){
     None = 61,
     Unknown,
     MAX
+};
+
+
+pub const WhatBuilds = [@intFromEnum(UnitType.MAX)]UnitType {
+    UnitType.Terran_Barracks, UnitType.Terran_Barracks, UnitType.Terran_Factory, UnitType.Terran_Factory, UnitType.None, UnitType.Terran_Factory, UnitType.None, UnitType.Terran_Command_Center, UnitType.Terran_Starport,
+    UnitType.Terran_Starport, UnitType.None, UnitType.Terran_Starport, UnitType.Terran_Starport, UnitType.None, UnitType.Terran_Nuclear_Silo, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
+    UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Terran_Factory, UnitType.None, UnitType.Terran_Barracks, UnitType.None, UnitType.Terran_Barracks, UnitType.Zerg_Hatchery, UnitType.Zerg_Larva,
+    UnitType.Zerg_Larva, UnitType.Zerg_Larva, UnitType.Zerg_Larva, UnitType.None, UnitType.Zerg_Larva, UnitType.Zerg_Larva, UnitType.Zerg_Larva, UnitType.Zerg_Mutalisk, UnitType.Zerg_Larva, UnitType.Zerg_Larva, UnitType.Zerg_Larva,
+    UnitType.None, UnitType.None, UnitType.Zerg_Infested_Command_Center, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Terran_Starport, UnitType.Zerg_Mutalisk, UnitType.Protoss_Stargate,
+    UnitType.Protoss_Gateway, UnitType.Zerg_Mutalisk, UnitType.Protoss_Dark_Templar, UnitType.Protoss_Nexus, UnitType.Protoss_Gateway, UnitType.Protoss_Gateway, UnitType.Protoss_Gateway,
+    UnitType.Protoss_High_Templar, UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Stargate, UnitType.Protoss_Stargate, UnitType.Protoss_Stargate, UnitType.Protoss_Carrier, UnitType.None, UnitType.None,
+    UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Robotics_Facility, UnitType.Protoss_Reaver, UnitType.None, UnitType.None, UnitType.None,
+    UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Zerg_Hydralisk, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Zerg_Hydralisk, UnitType.None, UnitType.None, UnitType.Terran_SCV,
+    UnitType.Terran_Command_Center, UnitType.Terran_Command_Center, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_Starport,
+    UnitType.Terran_SCV, UnitType.Terran_Science_Facility, UnitType.Terran_Science_Facility, UnitType.None, UnitType.Terran_Factory, UnitType.None, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_SCV,
+    UnitType.Terran_SCV, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Zerg_Drone, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Spire,
+    UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Drone, UnitType.Zerg_Creep_Colony, UnitType.None, UnitType.Zerg_Creep_Colony, UnitType.None, UnitType.None,
+    UnitType.Zerg_Drone, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.None, UnitType.Protoss_Probe, UnitType.Protoss_Probe,
+    UnitType.None, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.None, UnitType.Protoss_Probe, UnitType.Protoss_Probe,
+    UnitType.Protoss_Probe, UnitType.Protoss_Probe, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
+    UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
+    UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Unknown
 };

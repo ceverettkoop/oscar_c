@@ -1,3 +1,5 @@
+//TODO UPDATE LAST COMMAND ON FRAME!!!!
+
 const std = @import("std");
 const GameState = @This();
 const bwapi = @import("bwapi_module.zig");
@@ -15,7 +17,8 @@ self_race: c_int,
 enemy_race: c_int,
 
 //definitions
-const UnitRole = enum { MINER, 
+const UnitRole = enum { 
+    MINER, 
     GAS_GATHER, 
     BUILDER, 
     SCOUT, 
@@ -35,7 +38,8 @@ const UnitRecord = struct {
     is_friendly: bool,
     is_visible: bool,
     role: UnitRole, 
-    role_verified: bool 
+    role_verified: bool,
+    last_command: bw.UnitCommandType
 };
 
 pub fn init(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) void {
