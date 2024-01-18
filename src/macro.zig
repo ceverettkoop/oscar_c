@@ -2,7 +2,7 @@ const std = @import("std");
 const bw = @import("bwenums.zig");
 const bwapi = @import("bwapi_module.zig");
 const dir = @import("directive.zig");
-const GameState = @import("GameState.zig")
+const GameState = @import("GameState.zig");
 
 //if cur_builder succeeded, should delete itself
 //if cur_builder no longer working we reassign it
@@ -35,10 +35,10 @@ pub fn init_build(unit_type: bw.UnitType, location: dir.TargetLocation, gs: *Gam
             continue;
         }
         switch (record.role) {
-            gs.UnitRole.SCOUT => continue,
-            gs.UnitRole.ARMY => continue,
-            gs.UnitRole.BUILDER => continue, //this has to be set/unset properly!
-            else => _
+            .SCOUT => continue,
+            .ARMY => continue,
+            .BUILDER => continue, //this has to be set/unset properly!
+            else => 0
         }
         //eligible builder here
         return_tracker.cur_builder = record.id;
@@ -55,7 +55,7 @@ pub fn init_build(unit_type: bw.UnitType, location: dir.TargetLocation, gs: *Gam
 
 //naive attempt to build without tracking, tracker just holds
 //parameters for what we are trying to do
-fn build(track: ReturnTracker, Broodwar: ?*bwapi.Game) void{
+fn build(track: BuildTracker, Broodwar: ?*bwapi.Game) void{
     const unit_ptr = bwapi.Game_getUnit(Broodwar, @enumFromInt(track.cur_builder));
     if (unit_ptr) |u_ptr_val|{
         const builder_type = bw.WhatBuilds[@intFromEnum(unit_type)];
