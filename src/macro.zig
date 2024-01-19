@@ -20,7 +20,7 @@ pub fn init_build(unit_type: bw.UnitType, location: dir.TargetLocation, gs: *Gam
     Broodwar: ?*bwapi.Game) BuildTracker{
     const static_id = struct{
         var id: u32 = 0;
-    };
+    };  
     var return_tracker: BuildTracker = .{ 
         .build_id = static_id.id,
         .cur_builder = -1, //defaults to invalid
@@ -58,11 +58,12 @@ pub fn init_build(unit_type: bw.UnitType, location: dir.TargetLocation, gs: *Gam
 fn build(track: BuildTracker, Broodwar: ?*bwapi.Game) void{
     const unit_ptr = bwapi.Game_getUnit(Broodwar, @enumFromInt(track.cur_builder));
     if (unit_ptr) |u_ptr_val|{
-        const builder_type = bw.WhatBuilds[@intFromEnum(unit_type)];
+        const builder_type = bw.WhatBuilds[@intFromEnum(track.type)];
         //if we are just upgrading, just see if it's possible per bwapi
         if(builder_type != bw.UnitType.Zerg_Drone){ 
             if(bwapi.Unit_canMorph_UnitType(u_ptr_val, track.type, true, true)){
                 const target_type: bwapi.UnitType = .{.id = @intFromEnum(track.type)};
+                //TODO queue this command to execute at end of frame somehow
                 bwapi.Unit_morph(u_ptr_val, target_type);
                 //gamestate will check if we succeeded
                 return;
@@ -72,7 +73,7 @@ fn build(track: BuildTracker, Broodwar: ?*bwapi.Game) void{
 
         }
     }else{
-        print("Error getting unit_ptr on call to macro.build\n");
+        std.print("Error getting unit_ptr on call to macro.build\n");
         return;
     }
 }

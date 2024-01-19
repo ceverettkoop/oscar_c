@@ -1,17 +1,19 @@
-//TODO UPDATE LAST COMMAND ON FRAME!!!!
-
 const std = @import("std");
 const GameState = @This();
 const bwapi = @import("bwapi_module.zig");
 const bw = @import("bwenums.zig");
 const events = @import("events.zig");
+const Directive = @import("directive.zig").Directive;
 const BWAPIError = error{
     UnitNotFound,
     UnitRecordNotFound
 };
 
+const DIRECTIVE_FILE_PATH = std.fs.cwd();
+
 //members
 unit_list: std.AutoHashMap(c_int, UnitRecord),
+directive_list: std.ArrayList(Directive),
 self_player_id: c_int,
 self_race: c_int,
 enemy_race: c_int,
@@ -39,21 +41,23 @@ const UnitRecord = struct {
     is_visible: bool,
     role: UnitRole, 
     role_verified: bool,
-    last_command: bw.UnitCommandType
 };
 
 pub fn init(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) void {
     //allocations
     self.unit_list = std.AutoHashMap(c_int, UnitRecord).init(allocator);
+    self.directive_list = std.ArrayList(Directive).init(allocator);
     //determine races
     const me = bwapi.Game_self(Broodwar);
     const enemy = bwapi.Game_enemy(Broodwar);
     self.self_race =  bwapi.Player_getRace(me).id;
     self.enemy_race = bwapi.Player_getRace(enemy).id;
+    //parse directives
 }
 
 pub fn deinit(self: *GameState) void {
     self.unit_list.deinit();
+    self.directive_list.deinit();
 }
 
 //not handling nuke detect or system messages
