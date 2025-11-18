@@ -23,10 +23,13 @@ pub fn build(b: *std.Build) void {
 
     lib.root_module.addIncludePath(b.path("./include"));
     lib.root_module.addLibraryPath(b.path("./lib"));
-    lib.linkSystemLibrary("BWAPIC");
-    if (!windows_option){
-        lib.linkSystemLibrary("BWAPILIB"); 
-    }
 
+    if (!windows_option){
+        lib.linkSystemLibrary("BWAPILIB");
+        lib.linkSystemLibrary("BWAPIC");
+    }else{
+        lib.addObjectFile(b.path("./lib/BWAPIC.lib"));
+    }
+    
     b.installArtifact(lib);
 }
