@@ -1,5 +1,4 @@
 const std = @import("std");
-const ArrayList = std.ArrayList;
 const bwapi = @import("bwapi_module.zig");
 
 pub const EventType = enum(c_int) {
@@ -29,15 +28,15 @@ pub const UnitEvent = struct{
     unit_id: c_int,
 };
 
-pub fn gatherEvents(event_list: ?*ArrayList(UnitEvent), Broodwar: ?*bwapi.Game) !void{
+pub fn gatherEvents(event_list: ?*std.array_list.Managed(UnitEvent), Broodwar: ?*bwapi.Game) !void{
 
-    var event_it: *bwapi.Iterator = @ptrCast(bwapi.Game_getEvents(Broodwar).? ) ;
+    const event_it: *bwapi.Iterator = @ptrCast(bwapi.Game_getEvents(Broodwar).? ) ;
 
     while(bwapi.Iterator_valid(event_it)){
         const aligned_ptr: *align(@alignOf(*bwapi.Event))anyopaque = @alignCast(bwapi.Iterator_get(event_it).?);
         const event: *bwapi.Event = @ptrCast(aligned_ptr);
         const event_type: EventType = @enumFromInt(event.type.id);
-        var unit_related: bool = switch (event_type) {
+        const unit_related: bool = switch (event_type) {
             EventType.UnitComplete, EventType.UnitCreate, EventType.UnitDestroy,
             EventType.UnitDiscover, EventType.UnitEvade, EventType.UnitHide,
             EventType.UnitMorph, EventType.UnitRenegade, EventType.UnitShow

@@ -40,7 +40,7 @@ const Command = struct{
     target_loc: TargetLocation,
 };
 
-const Directive = struct{
+pub const Directive = struct{
     prereq: Prerequisite,
     command: Command
 };

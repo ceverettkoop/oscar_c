@@ -7,9 +7,9 @@ const Task = @import("task.zig").Task;
 
 pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state: ?*GameState) void {
     const state_ptr: *GameState = game_state orelse unreachable;
-    var new_events = std.ArrayList(events.UnitEvent).init(allocator);
+    var new_events = std.array_list.Managed(events.UnitEvent).init(allocator);
         defer new_events.deinit();
-    var tasks = std.ArrayList(Task).init(allocator);
+    var tasks = std.array_list.Managed(Task).init(allocator);
         defer tasks.deinit();
         
     //debug

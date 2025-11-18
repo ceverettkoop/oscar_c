@@ -12,7 +12,7 @@ const allocator = GPA.allocator();
 var game_state: ?*GameState = null;
 
 pub export fn gameInit(arg_game: ?*BWAPI_Game) void {
-    var game = arg_game;
+    const game = arg_game;
     Broodwar = @as(?*Game, @ptrCast(game));
     BWAPIC_setGame(Broodwar);
 }
@@ -25,8 +25,8 @@ pub export fn newAIModule() ?*BWAPI_AIModule {
 
 pub export fn onStart(arg_self: [*c]AIModule) void {
     //module stuff
-    var self = arg_self;
-    var module: [*c]OscarModule = @as([*c]OscarModule, @ptrCast(@alignCast(self)));
+    const self = arg_self;
+    const module: [*c]OscarModule = @as([*c]OscarModule, @ptrCast(@alignCast(self)));
     Game_sendText(Broodwar, "Hello from zig!");
     Game_sendText(Broodwar, "My name is %s", module.*.name);
     //end module
@@ -44,9 +44,9 @@ pub export fn onStart(arg_self: [*c]AIModule) void {
 }
 
 pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var isWinner = arg_isWinner;
+    const isWinner = arg_isWinner;
     _ = @TypeOf(isWinner);
     Game_sendText(Broodwar, "Game ended");
     const gs_ptr: *GameState = game_state.?;
@@ -54,7 +54,7 @@ pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
 }
 
 pub export fn onFrame(arg_self: [*c]AIModule) void {
-    var self = arg_self;
+    const self = arg_self;
     _ = @TypeOf(self);
     //actual bot here, pass it the game pointer along with allocator
     oscar.onFrame(Broodwar, allocator, game_state);
@@ -254,31 +254,31 @@ pub const struct_EventIterator_ = opaque {};
 pub const EventIterator = struct_EventIterator_;
 pub const struct_UnitTypeIterator_ = opaque {};
 pub const UnitTypeIterator = struct_UnitTypeIterator_;
-pub const UnaryUnitFilter = ?*const fn (?*Unit) callconv(.C) bool;
-pub const BestUnitFilter = ?*const fn (?*Unit, ?*Unit) callconv(.C) ?*Unit;
+pub const UnaryUnitFilter = ?*const fn (?*Unit) callconv(.c) bool;
+pub const BestUnitFilter = ?*const fn (?*Unit, ?*Unit) callconv(.c) ?*Unit;
 pub const AIModule_vtable = struct_AIModule_vtable;
 pub const struct_AIModule = extern struct {
     vtable: [*c]const AIModule_vtable,
 };
 pub const AIModule = struct_AIModule;
 pub const struct_AIModule_vtable = extern struct {
-    onStart: ?*const fn ([*c]AIModule) callconv(.C) void,
-    onEnd: ?*const fn ([*c]AIModule, bool) callconv(.C) void,
-    onFrame: ?*const fn ([*c]AIModule) callconv(.C) void,
-    onSendText: ?*const fn ([*c]AIModule, [*c]const u8) callconv(.C) void,
-    onReceiveText: ?*const fn ([*c]AIModule, ?*Player, [*c]const u8) callconv(.C) void,
-    onPlayerLeft: ?*const fn ([*c]AIModule, ?*Player) callconv(.C) void,
-    onNukeDetect: ?*const fn ([*c]AIModule, Position) callconv(.C) void,
-    onUnitDiscover: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitEvade: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitShow: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitHide: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitCreate: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitDestroy: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitMorph: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onUnitRenegade: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
-    onSaveGame: ?*const fn ([*c]AIModule, [*c]const u8) callconv(.C) void,
-    onUnitComplete: ?*const fn ([*c]AIModule, ?*Unit) callconv(.C) void,
+    onStart: ?*const fn ([*c]AIModule) callconv(.c) void,
+    onEnd: ?*const fn ([*c]AIModule, bool) callconv(.c) void,
+    onFrame: ?*const fn ([*c]AIModule) callconv(.c) void,
+    onSendText: ?*const fn ([*c]AIModule, [*c]const u8) callconv(.c) void,
+    onReceiveText: ?*const fn ([*c]AIModule, ?*Player, [*c]const u8) callconv(.c) void,
+    onPlayerLeft: ?*const fn ([*c]AIModule, ?*Player) callconv(.c) void,
+    onNukeDetect: ?*const fn ([*c]AIModule, Position) callconv(.c) void,
+    onUnitDiscover: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitEvade: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitShow: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitHide: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitCreate: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitDestroy: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitMorph: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onUnitRenegade: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
+    onSaveGame: ?*const fn ([*c]AIModule, [*c]const u8) callconv(.c) void,
+    onUnitComplete: ?*const fn ([*c]AIModule, ?*Unit) callconv(.c) void,
 };
 pub extern fn createAIModuleWrapper(module: [*c]AIModule) ?*anyopaque;
 pub extern fn destroyAIModuleWrapper(module: ?*anyopaque) void;
@@ -295,7 +295,7 @@ pub extern fn Bullet_getTarget(self: ?*Bullet) ?*Unit;
 pub extern fn Bullet_getTargetPosition(self: ?*Bullet) Position;
 pub extern fn Bullet_getRemoveTimer(self: ?*Bullet) c_int;
 pub extern fn Bullet_isVisible(self: ?*Bullet, player: ?*Player) bool;
-pub extern fn Bullet_registerEvent(self: ?*Bullet, action: ?*const fn (?*Bullet) callconv(.C) void, condition: ?*const fn (?*Bullet) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Bullet_registerEvent(self: ?*Bullet, action: ?*const fn (?*Bullet) callconv(.c) void, condition: ?*const fn (?*Bullet) callconv(.c) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn Force_getID(self: ?*Force) c_int;
 pub extern fn Force_getName(self: ?*Force) ?*BwString;
 pub extern fn Force_getPlayers(self: ?*Force) ?*PlayerIterator;
@@ -446,7 +446,7 @@ pub extern fn Game_getBuildLocation(self: ?*Game, @"type": UnitType, desiredPosi
 pub extern fn Game_getDamageFrom(self: ?*Game, fromType: UnitType, toType: UnitType, fromPlayer: ?*Player, toPlayer: ?*Player) c_int;
 pub extern fn Game_getDamageTo(self: ?*Game, toType: UnitType, fromType: UnitType, toPlayer: ?*Player, fromPlayer: ?*Player) c_int;
 pub extern fn Game_getRandomSeed(self: ?*Game) c_uint;
-pub extern fn Game_registerEvent(self: ?*Game, action: ?*const fn (?*Game) callconv(.C) void, condition: ?*const fn (?*Game) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Game_registerEvent(self: ?*Game, action: ?*const fn (?*Game) callconv(.c) void, condition: ?*const fn (?*Game) callconv(.c) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn Iterator_valid(self: ?*const Iterator) bool;
 pub extern fn Iterator_get(self: ?*const Iterator) ?*anyopaque;
 pub extern fn Iterator_next(self: ?*Iterator) void;
@@ -731,7 +731,7 @@ pub extern fn Unit_canUseTechPosition(self: ?*Unit, tech: TechType, checkCanIssu
 pub extern fn Unit_canUseTechPosition_Position(self: ?*Unit, tech: TechType, target: Position, checkTargetsPositions: bool, checkCanIssueCommandType: bool, checkCommandibility: bool) bool;
 pub extern fn Unit_canPlaceCOP(self: ?*Unit, checkCommandibility: bool) bool;
 pub extern fn Unit_canPlaceCOP_TilePosition(self: ?*Unit, target: TilePosition, checkCanIssueCommandType: bool, checkCommandibility: bool) bool;
-pub extern fn Unit_registerEvent(self: ?*Unit, action: ?*const fn (?*Unit) callconv(.C) void, condition: ?*const fn (?*Unit) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Unit_registerEvent(self: ?*Unit, action: ?*const fn (?*Unit) callconv(.c) void, condition: ?*const fn (?*Unit) callconv(.c) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn Player_getID(self: ?*Player) c_int;
 pub extern fn Player_getName(self: ?*Player) ?*BwString;
 pub extern fn Player_getUnits(self: ?*Player) ?*UnitIterator;
@@ -786,7 +786,7 @@ pub extern fn Player_getMaxUpgradeLevel(self: ?*Player, upgrade: UpgradeType) c_
 pub extern fn Player_isResearchAvailable(self: ?*Player, tech: TechType) bool;
 pub extern fn Player_isUnitAvailable(self: ?*Player, unit: UnitType) bool;
 pub extern fn Player_hasUnitTypeRequirement(self: ?*Player, unit: UnitType, amount: c_int) bool;
-pub extern fn Player_registerEvent(self: ?*Player, action: ?*const fn (?*Player) callconv(.C) void, condition: ?*const fn (?*Player) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Player_registerEvent(self: ?*Player, action: ?*const fn (?*Player) callconv(.c) void, condition: ?*const fn (?*Player) callconv(.c) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn Region_getID(self: ?*Region) c_int;
 pub extern fn Region_getRegionGroupID(self: ?*Region) c_int;
 pub extern fn Region_getCenter(self: ?*Region) Position;
@@ -802,7 +802,7 @@ pub extern fn Region_getClosestAccessibleRegion(self: ?*Region) ?*Region;
 pub extern fn Region_getClosestInaccessibleRegion(self: ?*Region) ?*Region;
 pub extern fn Region_getDistance(self: ?*Region, other: ?*Region) c_int;
 pub extern fn Region_getUnits(self: ?*Region, pred: UnaryUnitFilter) ?*UnitIterator;
-pub extern fn Region_registerEvent(self: ?*Region, action: ?*const fn (?*Region) callconv(.C) void, condition: ?*const fn (?*Region) callconv(.C) bool, timesToRun: c_int, framesToCheck: c_int) void;
+pub extern fn Region_registerEvent(self: ?*Region, action: ?*const fn (?*Region) callconv(.c) void, condition: ?*const fn (?*Region) callconv(.c) bool, timesToRun: c_int, framesToCheck: c_int) void;
 pub extern fn BwString_new(data: [*c]const u8, len: c_int) ?*BwString;
 pub extern fn BwString_data(self: ?*const BwString) [*c]const u8;
 pub extern fn BwString_len(self: ?*const BwString) c_int;
@@ -820,89 +820,89 @@ pub const struct_OscarModule_tag = extern struct {
 pub const OscarModule = struct_OscarModule_tag;
 
 pub export fn onSendText(arg_module: [*c]AIModule, arg_text: [*c]const u8) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var text = arg_text;
+    const text = arg_text;
     _ = @TypeOf(text);
 }
 pub export fn onReceiveText(arg_module: [*c]AIModule, arg_player: ?*Player, arg_text: [*c]const u8) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var player = arg_player;
+    const player = arg_player;
     _ = @TypeOf(player);
-    var text = arg_text;
+    const text = arg_text;
     _ = @TypeOf(text);
 }
 pub export fn onPlayerLeft(arg_module: [*c]AIModule, arg_player: ?*Player) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var player = arg_player;
+    const player = arg_player;
     _ = @TypeOf(player);
 }
 pub export fn onNukeDetect(arg_module: [*c]AIModule, arg_target: Position) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var target = arg_target;
+    const target = arg_target;
     _ = @TypeOf(target);
 }
 pub export fn onUnitDiscover(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitEvade(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitShow(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitHide(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitCreate(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitDestroy(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitMorph(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onUnitRenegade(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub export fn onSaveGame(arg_module: [*c]AIModule, arg_gameName: [*c]const u8) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var gameName = arg_gameName;
+    const gameName = arg_gameName;
     _ = @TypeOf(gameName);
 }
 pub export fn onUnitComplete(arg_module: [*c]AIModule, arg_unit: ?*Unit) void {
-    var module = arg_module;
+    const module = arg_module;
     _ = @TypeOf(module);
-    var unit = arg_unit;
+    const unit = arg_unit;
     _ = @TypeOf(unit);
 }
 pub var module_vtable: AIModule_vtable = AIModule_vtable{

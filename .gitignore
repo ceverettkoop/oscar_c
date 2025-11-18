@@ -5,3 +5,4 @@ zig-out/**
 lib/*.so
 lib/*.dylib
 bwapi/**
+.zig-cache/**

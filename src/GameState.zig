@@ -13,7 +13,7 @@ const DIRECTIVE_FILE_PATH = std.fs.cwd();
 
 //members
 unit_list: std.AutoHashMap(c_int, UnitRecord),
-directive_list: std.ArrayList(Directive),
+directive_list: std.array_list.Managed(Directive),
 self_player_id: c_int,
 self_race: c_int,
 enemy_race: c_int,
@@ -46,7 +46,7 @@ const UnitRecord = struct {
 pub fn init(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) void {
     //allocations
     self.unit_list = std.AutoHashMap(c_int, UnitRecord).init(allocator);
-    self.directive_list = std.ArrayList(Directive).init(allocator);
+    self.directive_list = std.array_list.Managed(Directive).init(allocator);
     //determine races
     const me = bwapi.Game_self(Broodwar);
     const enemy = bwapi.Game_enemy(Broodwar);
@@ -62,7 +62,7 @@ pub fn deinit(self: *GameState) void {
 
 //not handling nuke detect or system messages
 pub fn updateGameStateFromEvents(self: *GameState, 
-    new_events: std.ArrayList(events.UnitEvent), Broodwar: ?*bwapi.Game) void{
+    new_events: std.array_list.Managed(events.UnitEvent), Broodwar: ?*bwapi.Game) void{
     const EventType = events.EventType;
     for (new_events.items) |event| {
         switch (event.type) {
