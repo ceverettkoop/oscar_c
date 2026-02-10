@@ -13,7 +13,7 @@ pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state:
         defer tasks.deinit();
         
     //debug
-    drawDebugInfo(Broodwar);
+    drawDebugInfo(Broodwar); 
 
     //gather events
     events.gatherEvents(&new_events, Broodwar) catch unreachable;

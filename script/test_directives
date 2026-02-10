@@ -1,0 +1,6 @@
+TIMESTAP 0 X : ALWAYS_DRONE X ANYWHERE
+SUPPLY 12 X : BUILD 1 Zerg_Spawning_Pool MAIN
+UNIT_QTY 8 Zerg_Mutalisk : FORM_ARMY 8 Zerg_Mutalisk ANYWHERE
+
+#(UNIT_QTY/SUPPLY/TIMESTAMP/FLAG) X (UNIT_TYPE/TIME/FLAG_VAL) : (COMMAND) X (UNIT_TYPE) (LOCATION)
+#string, u8, string : string, u8, string, string
