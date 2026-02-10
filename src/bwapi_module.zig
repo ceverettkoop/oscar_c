@@ -1,12 +1,13 @@
-//human written/readable functions at top, followed by auto generated C to zig mapping 
-
+//human written/readable functions at top, followed by auto generated C to zig mapping
 const std = @import("std");
 const oscar = @import("oscar.zig");
 const GameState = @import("GameState.zig");
+const directive = @import("directive.zig");
 const win = std.os.windows;
 const bw = @import("bwenums.zig");
 var GPA = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = GPA.allocator();
+const script_path = "script/test_directives";
 
 //only global ideally
 var game_state: ?*GameState = null;
@@ -30,17 +31,28 @@ pub export fn onStart(arg_self: [*c]AIModule) void {
     Game_sendText(Broodwar, "Hello from zig!");
     Game_sendText(Broodwar, "My name is %s", module.*.name);
     //end module
-    
+
     //allocate gamestate
     game_state = allocator.create(GameState) catch null; //hack bc interfaces w c
     const gs_ptr: *GameState = game_state.?;
     gs_ptr.*.init(allocator, Broodwar);
 
     //cry if not zerg
-    if(gs_ptr.*.self_race != @intFromEnum(bw.Race.Zerg) ){
+    if (gs_ptr.*.self_race != @intFromEnum(bw.Race.Zerg)) {
         Game_sendText(Broodwar, "I am not zerg so no clue :(");
     }
 
+    //parse directives
+    const parsed = directive.parseDirectiveFile(allocator, script_path) catch |err| {
+        Game_sendText(Broodwar, "Error parsing directives: %d", @intFromError(err));
+        return;
+    };
+    defer allocator.free(parsed);
+    gs_ptr.*.directive_list.appendSlice(parsed) catch |err| {
+        Game_sendText(Broodwar, "Error loading directives: %d", @intFromError(err));
+        allocator.free(parsed);
+        return;
+    };
 }
 
 pub export fn onEnd(arg_module: [*c]AIModule, arg_isWinner: bool) void {
@@ -59,7 +71,6 @@ pub export fn onFrame(arg_self: [*c]AIModule) void {
     //actual bot here, pass it the game pointer along with allocator
     oscar.onFrame(Broodwar, allocator, game_state);
 }
-
 
 //END HUMAN WRITTEN CODE
 
