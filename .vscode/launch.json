@@ -9,6 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/starcraft/BWAPILauncher",
+            "preLaunchTask": "zig build macos",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/starcraft",
