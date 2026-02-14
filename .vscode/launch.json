@@ -15,7 +15,46 @@
             "envFile": "${workspaceFolder}/.mac.env",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "lldb",
+            "targetArchitecture": "arm64",
+            "setupCommands": [
+                {
+                    "description": "Set architecture to arm64",
+                    "text": "settings set target.prefer-dynamic-value no-dynamic-values",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable inline breakpoints",
+                    "text": "settings set target.inline-breakpoint-strategy always",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Add debug symbol search path",
+                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/lib",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set pending breakpoints",
+                    "text": "settings set target.load-script-from-symbol-file false",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Break when liboscar loads",
+                    "text": "breakpoint set --one-shot true --name _onStart",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set future breakpoint for parseDirectiveFile",
+                    "text": "breakpoint set --file directive.zig --line 131",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Load liboscar dSYM bundle",
+                    "text": "target symbols add ${workspaceFolder}/zig-out/lib/liboscar.dylib.dSYM",
+                    "ignoreFailures": true
+                }
+            ],
+            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
         },
         {
             "name": "(gdb) Launch LINUX",
@@ -40,6 +79,31 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "(lldb) Attach to Process",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/starcraft/BWAPILauncher",
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "description": "Add debug symbol search path",
+                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/lib",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set breakpoint for parseDirectiveFile",
+                    "text": "breakpoint set --file directive.zig --line 131",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Load liboscar dSYM bundle",
+                    "text": "target symbols add ${workspaceFolder}/zig-out/lib/liboscar.dylib.dSYM",
+                    "ignoreFailures": true
+                }
+            ],
+            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
         }
         ]
 }
