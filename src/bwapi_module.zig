@@ -7,7 +7,7 @@ const win = std.os.windows;
 const bw = @import("bwenums.zig");
 var GPA = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = GPA.allocator();
-const script_path = "script/test_directives";
+const script_path = "../script/test_directives";
 
 //only global ideally
 var game_state: ?*GameState = null;
