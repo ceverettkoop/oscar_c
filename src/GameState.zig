@@ -4,6 +4,7 @@ const bwapi = @import("bwapi_module.zig");
 const bw = @import("bwenums.zig");
 const events = @import("events.zig");
 const Directive = @import("directive.zig").Directive;
+const Status = @import("directive.zig").Status;
 const BWAPIError = error{ UnitNotFound, UnitRecordNotFound };
 const Task = @import("task.zig").Task;
 
@@ -84,18 +85,18 @@ pub fn updateGameStateFromEvents(self: *GameState, new_events: std.array_list.Ma
     }
 }
 
-pub fn tasksFromDirectives(self: *GameState, allocator: std.mem.Allocator) []const Task {
+pub fn tasksFromDirectives(self: *GameState, allocator: std.mem.Allocator) ![]const Task {
     //see if prereq is satisfied for any inactive directive
-    var tasks = std.ArrayList(Task).init(allocator);
-    defer tasks.deinit;
+    var tasks: std.ArrayList(Task) = .empty;
+    defer tasks.deinit(allocator);
 
     for (self.directive_list.items) |dir| {
-        if (dir.status != Directive.Status.INACTIVE) continue;
+        if (dir.status != Status.INACTIVE) continue;
         //TODO logic to revisit certain done ones
 
     }
 
-    return tasks.toOwnedSlice();
+    return tasks.toOwnedSlice(allocator);
 }
 
 //called once we are sure a unit is new to us

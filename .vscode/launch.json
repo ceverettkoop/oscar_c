@@ -95,6 +95,42 @@
                 }
             ],
             "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
+        },
+        {
+            "name": "(gdb) Launch WINE Windows",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": ["RunStarcraftWithBWAPI.bat"],
+            "preLaunchTask": "zig build windows",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/starcraft",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable pending breakpoints",
+                    "text": "set breakpoint pending on",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Add debug symbol search path",
+                    "text": "set solib-search-path ${workspaceFolder}/zig-out/lib",
+                    "ignoreFailures": true
+                }
+            ],
+            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
         }
         ]
 }

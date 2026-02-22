@@ -53,6 +53,27 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "zig build windows",
+            "type": "shell",
+            "command": "zig",
+            "args": [
+                "build",
+                "-Dwindows=true"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
         }
     ]
 }

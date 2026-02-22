@@ -20,8 +20,11 @@ pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state:
     //update gamestate
     state_ptr.updateGameStateFromEvents(new_events, Broodwar);
 
-    var tasks = state_ptr.tasksFromDirectives(allocator);
-    defer tasks.deinit();
+    const tasks = state_ptr.tasksFromDirectives(allocator) catch |err|{
+        std.debug.print("Error parsing tasks: {}", .{@intFromError(err)});
+        return;
+    };
+    defer allocator.free(tasks);
 
     //state_ptr.identify_battles(Broodwar)
 
