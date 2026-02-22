@@ -5,6 +5,38 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) Attach Wine - oscar.dll",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/zig-out/bin/oscar.dll",
+            "processId": "${command:pickProcess}",
+            "MIMode": "lldb",
+            "miDebuggerPath": "/usr/bin/lldb-mi",
+            "targetArchitecture": "x86",
+            "setupCommands": [
+                {
+                    "description": "Set architecture to i386 for 32-bit Wine process",
+                    "text": "settings set target.default-arch i386",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable inline breakpoints",
+                    "text": "settings set target.inline-breakpoint-strategy always",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Search path so LLDB can find oscar.pdb next to oscar.dll",
+                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/bin",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Explicitly load PDB symbols for oscar.dll",
+                    "text": "target symbols add ${workspaceFolder}/zig-out/bin/oscar.pdb",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "(lldb) Launch MAC",
             "type": "cppdbg",
             "request": "launch",
@@ -46,91 +78,6 @@
                 }
             ],
             "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
-        },
-        {
-            "name": "(gdb) Launch LINUX",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/starcraft/BWAPILauncher",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/starcraft",
-            "envFile": "${workspaceFolder}/.env",
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
-            "name": "(lldb) Attach to Process",
-            "type": "cppdbg",
-            "request": "attach",
-            "program": "${workspaceFolder}/starcraft/BWAPILauncher",
-            "MIMode": "lldb",
-            "setupCommands": [
-                {
-                    "description": "Add debug symbol search path",
-                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/lib",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set breakpoint for parseDirectiveFile",
-                    "text": "breakpoint set --file directive.zig --line 131",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Load liboscar dSYM bundle",
-                    "text": "target symbols add ${workspaceFolder}/zig-out/lib/liboscar.dylib.dSYM",
-                    "ignoreFailures": true
-                }
-            ],
-            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
-        },
-        {
-            "name": "(gdb) Launch WINE Windows",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "/usr/bin/wine",
-            "args": ["RunStarcraftWithBWAPI.bat"],
-            "preLaunchTask": "zig build windows",
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/starcraft",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Enable pending breakpoints",
-                    "text": "set breakpoint pending on",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Add debug symbol search path",
-                    "text": "set solib-search-path ${workspaceFolder}/zig-out/lib",
-                    "ignoreFailures": true
-                }
-            ],
-            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
         }
-        ]
+    ]
 }

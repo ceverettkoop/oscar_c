@@ -85,18 +85,37 @@ pub fn updateGameStateFromEvents(self: *GameState, new_events: std.array_list.Ma
     }
 }
 
-pub fn tasksFromDirectives(self: *GameState, allocator: std.mem.Allocator) ![]const Task {
+pub fn getNewDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) ![]const Directive {
     //see if prereq is satisfied for any inactive directive
-    var tasks: std.ArrayList(Task) = .empty;
-    defer tasks.deinit(allocator);
+    var new_dirs: std.ArrayList(Directive) = .empty;
+    defer new_dirs.deinit(allocator);
 
-    for (self.directive_list.items) |dir| {
+    for (self.directive_list.items) |*dir| {
         if (dir.status != Status.INACTIVE) continue;
-        //TODO logic to revisit certain done ones
-
+        //TODO logic to revisit certain done ones. rn done is done
+        switch (dir.prereq.prereq_type) {
+            .AI_FLAG => break,
+            .SUPPLY => {
+                if (bwapi.Player_supplyUsed(bwapi.Game_self(Broodwar), .{ .id = self.self_race }) == dir.prereq.pre_req_qty) {
+                    try new_dirs.append(allocator, dir.*);
+                    dir.status = Status.IN_PROGRESS;
+                }
+                break;
+            },
+            .TIMESTAMP => {
+                if (bwapi.Game_elapsedTime(Broodwar) >= dir.prereq.pre_req_qty) {
+                    try new_dirs.append(allocator, dir.*);
+                    dir.status = Status.IN_PROGRESS;
+                }
+                break;
+            },
+            .UNIT_QTY => {
+                //TODO something
+                break;
+            },
+        }
     }
-
-    return tasks.toOwnedSlice(allocator);
+    return new_dirs.toOwnedSlice(allocator);
 }
 
 //called once we are sure a unit is new to us
