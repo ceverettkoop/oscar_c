@@ -4,22 +4,25 @@ const bw = @import("bwenums.zig");
 const events = @import("events.zig");
 const GameState = @import("GameState.zig");
 const Task = @import("task.zig").Task;
+const Directive = @import("directive.zig");
 
 pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state: ?*GameState) void {
     const state_ptr: *GameState = game_state orelse unreachable;
     var new_events = std.array_list.Managed(events.UnitEvent).init(allocator);
-        defer new_events.deinit();
-    var tasks = std.array_list.Managed(Task).init(allocator);
-        defer tasks.deinit();
-        
+    defer new_events.deinit();
+
     //debug
-    drawDebugInfo(Broodwar); 
+    drawDebugInfo(Broodwar);
 
     //gather events
     events.gatherEvents(&new_events, Broodwar) catch unreachable;
 
     //update gamestate
     state_ptr.updateGameStateFromEvents(new_events, Broodwar);
+
+    var tasks = state_ptr.tasksFromDirectives(allocator);
+    defer tasks.deinit();
+
     //state_ptr.identify_battles(Broodwar)
 
     //init list of tasks to perform at end of function
@@ -32,7 +35,6 @@ pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state:
     //commands to issue = priorities + gamestate
 
     //execute commands
-
 
 }
 

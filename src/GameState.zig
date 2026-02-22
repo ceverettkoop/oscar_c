@@ -4,10 +4,8 @@ const bwapi = @import("bwapi_module.zig");
 const bw = @import("bwenums.zig");
 const events = @import("events.zig");
 const Directive = @import("directive.zig").Directive;
-const BWAPIError = error{
-    UnitNotFound,
-    UnitRecordNotFound
-};
+const BWAPIError = error{ UnitNotFound, UnitRecordNotFound };
+const Task = @import("task.zig").Task;
 
 const DIRECTIVE_FILE_PATH = std.fs.cwd();
 
@@ -19,27 +17,17 @@ self_race: c_int,
 enemy_race: c_int,
 
 //definitions
-const UnitRole = enum { 
-    MINER, 
-    GAS_GATHER, 
-    BUILDER, 
-    SCOUT, 
-    ARMY, 
-    UNKNOWN 
-};
+const UnitRole = enum { MINER, GAS_GATHER, BUILDER, SCOUT, ARMY, UNKNOWN };
 
 //weighted random selection
-const Strategy = enum{
-    FOUR_POOL,
-    OGRE_ZERG
-};
+const Strategy = enum { FOUR_POOL, OGRE_ZERG };
 
-const UnitRecord = struct { 
-    id: c_int, 
-    type: bw.UnitType, 
+const UnitRecord = struct {
+    id: c_int,
+    type: bw.UnitType,
     is_friendly: bool,
     is_visible: bool,
-    role: UnitRole, 
+    role: UnitRole,
     role_verified: bool,
 };
 
@@ -50,7 +38,7 @@ pub fn init(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Ga
     //determine races
     const me = bwapi.Game_self(Broodwar);
     const enemy = bwapi.Game_enemy(Broodwar);
-    self.self_race =  bwapi.Player_getRace(me).id;
+    self.self_race = bwapi.Player_getRace(me).id;
     self.enemy_race = bwapi.Player_getRace(enemy).id;
     //parse directives
 }
@@ -61,34 +49,33 @@ pub fn deinit(self: *GameState) void {
 }
 
 //not handling nuke detect or system messages
-pub fn updateGameStateFromEvents(self: *GameState, 
-    new_events: std.array_list.Managed(events.UnitEvent), Broodwar: ?*bwapi.Game) void{
+pub fn updateGameStateFromEvents(self: *GameState, new_events: std.array_list.Managed(events.UnitEvent), Broodwar: ?*bwapi.Game) void {
     const EventType = events.EventType;
     for (new_events.items) |event| {
         switch (event.type) {
             //have to handle unit registration failure here so not passed up to toframe
-            EventType.UnitCreate => registerNewUnit(self, event, Broodwar) catch |err|{
+            EventType.UnitCreate => registerNewUnit(self, event, Broodwar) catch |err| {
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
             },
-            EventType.UnitDiscover => registerNewUnit(self, event, Broodwar) catch |err|{
+            EventType.UnitDiscover => registerNewUnit(self, event, Broodwar) catch |err| {
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on registration\n", .{});
             },
-            EventType.UnitMorph => updateUnitType(self, event, Broodwar) catch |err|{
+            EventType.UnitMorph => updateUnitType(self, event, Broodwar) catch |err| {
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on morph\n", .{});
                 if (err == BWAPIError.UnitRecordNotFound) std.debug.print("UnitRecordNotFound on morph\n", .{});
             },
-            EventType.UnitRenegade => updateUnitType(self, event, Broodwar) catch |err|{
+            EventType.UnitRenegade => updateUnitType(self, event, Broodwar) catch |err| {
                 if (err == BWAPIError.UnitNotFound) std.debug.print("UnitNotFound error on morph\n", .{});
                 if (err == BWAPIError.UnitRecordNotFound) std.debug.print("UnitRecordNotFound on morph\n", .{});
             },
-            EventType.UnitDestroy => rmUnit(self, event) catch |err|{
+            EventType.UnitDestroy => rmUnit(self, event) catch |err| {
                 if (err == BWAPIError.UnitRecordNotFound) std.debug.print("UnRecordNotFound on remove\n", .{});
             },
-            EventType.UnitHide =>{
+            EventType.UnitHide => {
                 const record = self.unit_list.getPtr(event.unit_id) orelse return std.debug.print("UnitRecordNotFound on hide\n", .{});
                 record.is_visible = false;
             },
-            EventType.UnitShow =>{
+            EventType.UnitShow => {
                 const record = self.unit_list.getPtr(event.unit_id) orelse return std.debug.print("UnitRecordNotFound on show\n", .{});
                 record.is_visible = true;
             },
@@ -97,11 +84,25 @@ pub fn updateGameStateFromEvents(self: *GameState,
     }
 }
 
+pub fn tasksFromDirectives(self: *GameState, allocator: std.mem.Allocator) []const Task {
+    //see if prereq is satisfied for any inactive directive
+    var tasks = std.ArrayList(Task).init(allocator);
+    defer tasks.deinit;
+
+    for (self.directive_list.items) |dir| {
+        if (dir.status != Directive.Status.INACTIVE) continue;
+        //TODO logic to revisit certain done ones
+
+    }
+
+    return tasks.toOwnedSlice();
+}
+
 //called once we are sure a unit is new to us
-fn registerNewUnit(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void{
+fn registerNewUnit(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void {
     //check if unit is found by id
     const unit_ptr = bwapi.Game_getUnit(Broodwar, event.unit_id);
-    if (unit_ptr) |u_ptr_val|{
+    if (unit_ptr) |u_ptr_val| {
         const unit_owner = bwapi.Unit_getPlayer(u_ptr_val) orelse unreachable; //hard crash
         //create and append record
         const new_unit: UnitRecord = .{
@@ -113,28 +114,28 @@ fn registerNewUnit(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.
             .role_verified = false,
         };
         try self.unit_list.put(new_unit.id, new_unit);
-    }else{
+    } else {
         //handle null unit ptr
         return BWAPIError.UnitNotFound;
     }
 }
 
 //only applicable for morph? updates type on unit per event
-fn updateUnitType(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void{
+fn updateUnitType(self: *GameState, event: events.UnitEvent, Broodwar: ?*bwapi.Game) !void {
     //check if unit is found by id
     const unit_ptr = bwapi.Game_getUnit(Broodwar, event.unit_id);
-    if (unit_ptr)|u_ptr_val|{
+    if (unit_ptr) |u_ptr_val| {
         //we have to check ownership as well as type specifically for geyser to extractor case
         const unit_owner = bwapi.Unit_getPlayer(u_ptr_val) orelse unreachable; //hard crash
         const record = self.unit_list.getPtr(event.unit_id) orelse return BWAPIError.UnitRecordNotFound;
         record.type = @enumFromInt(bwapi.Unit_getType(u_ptr_val).id);
         record.is_friendly = (bwapi.Player_getID(unit_owner) == self.self_player_id);
-    }else{
+    } else {
         return BWAPIError.UnitNotFound;
     }
 }
 
-fn rmUnit(self: *GameState, event: events.UnitEvent) !void{
+fn rmUnit(self: *GameState, event: events.UnitEvent) !void {
     //check if unit is found by id and remove
     const removed = self.unit_list.remove(event.unit_id);
     if (!removed) return BWAPIError.UnitRecordNotFound;

@@ -8,6 +8,8 @@ pub const PrereqType = enum { UNIT_QTY, TIMESTAMP, AI_FLAG, SUPPLY };
 
 pub const TargetLocation = enum { MAIN, NATURAL, NEXT_VALID_EXP, LAST_SUCCESSFUL_EXP, ENEMY_MAIN, NEAREST_ENEMY_BASE, ANYWHERE };
 
+pub const Status = enum { INACTIVE, IN_PROGRESS, DONE };
+
 pub const Prerequisite = struct {
     prereq_type: PrereqType,
     pre_req_qty: u8, //qty of unit required, or seconds elapsed or flag from oscar
@@ -21,7 +23,7 @@ pub const Command = struct {
     target_loc: TargetLocation,
 };
 
-pub const Directive = struct { prereq: Prerequisite, command: Command };
+pub const Directive = struct { prereq: Prerequisite, command: Command, status: Status };
 
 //(UNIT_QTY/SUPPLY/TIMESTAMP/FLAG) X (UNIT_TYPE/TIME/FLAG_VAL) : (COMMAND) X (UNIT_TYPE) (LOCATION)
 //EXAMPLE
@@ -100,19 +102,16 @@ fn parseLine(line: []const u8) ParseError!Directive {
     const target_type = try parseUnitType(command_unit_str);
     const target_loc = try parseLocation(command_loc_str);
 
-    return Directive{
-        .prereq = Prerequisite{
-            .prereq_type = prereq_type,
-            .pre_req_qty = prereq_qty,
-            .prereq_value = prereq_value,
-        },
-        .command = Command{
-            .type = command_type,
-            .target_type = target_type,
-            .target_qty = command_qty,
-            .target_loc = target_loc,
-        },
-    };
+    return Directive{ .prereq = Prerequisite{
+        .prereq_type = prereq_type,
+        .pre_req_qty = prereq_qty,
+        .prereq_value = prereq_value,
+    }, .command = Command{
+        .type = command_type,
+        .target_type = target_type,
+        .target_qty = command_qty,
+        .target_loc = target_loc,
+    }, .status = Status.INACTIVE };
 }
 
 pub fn parseDirectiveFile(allocator: std.mem.Allocator, file_path: []const u8) ![]Directive {
