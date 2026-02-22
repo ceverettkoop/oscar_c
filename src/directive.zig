@@ -81,9 +81,11 @@ fn parseLine(line: []const u8) ParseError!Directive {
             const unit_type = try parseUnitType(prereq_value_str);
             break :blk @intFromEnum(unit_type);
         },
-        .TIMESTAMP => std.fmt.parseInt(c_int, prereq_value_str, 10) catch return ParseError.InvalidNumber,
-        .AI_FLAG => std.fmt.parseInt(c_int, prereq_value_str, 10) catch return ParseError.InvalidNumber,
+        //timestamp and supply do not have a value
         .SUPPLY => 0, // X is ignored for SUPPLY
+        .TIMESTAMP => 0,
+        //TODO change this to coherent enum
+        .AI_FLAG => std.fmt.parseInt(c_int, prereq_value_str, 10) catch return ParseError.InvalidNumber,
     };
 
     // Parse command: COMMAND_TYPE QTY UNIT_TYPE LOCATION

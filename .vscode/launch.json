@@ -40,16 +40,6 @@
                     "ignoreFailures": true
                 },
                 {
-                    "description": "Break when liboscar loads",
-                    "text": "breakpoint set --one-shot true --name _onStart",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set future breakpoint for parseDirectiveFile",
-                    "text": "breakpoint set --file directive.zig --line 131",
-                    "ignoreFailures": true
-                },
-                {
                     "description": "Load liboscar dSYM bundle",
                     "text": "target symbols add ${workspaceFolder}/zig-out/lib/liboscar.dylib.dSYM",
                     "ignoreFailures": true
