@@ -20,14 +20,18 @@ pub fn onFrame(Broodwar: ?*bwapi.Game, allocator: std.mem.Allocator, game_state:
     //update gamestate
     state_ptr.updateGameStateFromEvents(new_events, Broodwar);
 
-    //find new things to do
-    const new_directives = state_ptr.getNewDirectives(allocator, Broodwar) catch |err| {
-        std.debug.print("Error determining active directives: {}", .{@intFromError(err)});
-        return;
+    //find newly applicable directives, generate tasks based on these
+    state_ptr.updateTasksFromNewDirectives(allocator, Broodwar) catch |err|{
+        std.debug.print("Error updating task list: {}", .{@intFromError(err)});
+    };
+    //note that this will also set those directives as in progress
+    const new_directives = state_ptr.getActiveDirectives(allocator, Broodwar) catch |err| {
+
     };
     defer allocator.free(new_directives);
 
-    //create tasks from new things
+    //for each new_directive, create tasks linked to it and append them to gs tasks
+    state_ptr.newTaks
 
     //state_ptr.identify_battles(Broodwar)
 

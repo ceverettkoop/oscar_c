@@ -12,7 +12,9 @@ const DIRECTIVE_FILE_PATH = std.fs.cwd();
 
 //members
 unit_list: std.AutoHashMap(c_int, UnitRecord),
+//TODO update array_list syntax
 directive_list: std.array_list.Managed(Directive),
+task_list: std.array_list(Task),
 self_player_id: c_int,
 self_race: c_int,
 enemy_race: c_int,
@@ -85,7 +87,12 @@ pub fn updateGameStateFromEvents(self: *GameState, new_events: std.array_list.Ma
     }
 }
 
-pub fn getNewDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) ![]const Directive {
+pub fn updateTasksFromNewDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) !void {
+    const new_directives = state_ptr.getActiveDirectives(allocator, Broodwar);
+    defer allocator.free(new_directives);
+}
+
+fn getActiveDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) ![]const *Directive {
     //see if prereq is satisfied for any inactive directive
     var new_dirs: std.ArrayList(Directive) = .empty;
     defer new_dirs.deinit(allocator);
