@@ -88,8 +88,10 @@ pub fn updateGameStateFromEvents(self: *GameState, new_events: std.array_list.Ma
 }
 
 pub fn updateTasksFromNewDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) !void {
-    const new_directives = state_ptr.getActiveDirectives(allocator, Broodwar);
+    const new_directives = self.getActiveDirectives(allocator, Broodwar);
     defer allocator.free(new_directives);
+
+    for (new_directives) |dir| {}
 }
 
 fn getActiveDirectives(self: *GameState, allocator: std.mem.Allocator, Broodwar: ?*bwapi.Game) ![]const *Directive {
