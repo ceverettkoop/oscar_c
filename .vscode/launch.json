@@ -1,14 +1,11 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "name": "(lldb) Attach Wine - oscar.dll",
             "type": "cppdbg",
             "request": "attach",
-            "program": "${workspaceFolder}/zig-out/bin/oscar.dll",
+            "program": "${workspaceFolder}/build/oscar.dll",
             "processId": "${command:pickProcess}",
             "MIMode": "lldb",
             "miDebuggerPath": "/usr/bin/lldb-mi",
@@ -26,12 +23,7 @@
                 },
                 {
                     "description": "Search path so LLDB can find oscar.pdb next to oscar.dll",
-                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/bin",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Explicitly load PDB symbols for oscar.dll",
-                    "text": "target symbols add ${workspaceFolder}/zig-out/bin/oscar.pdb",
+                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/build",
                     "ignoreFailures": true
                 }
             ]
@@ -41,7 +33,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/starcraft/BWAPILauncher",
-            "preLaunchTask": "zig build macos",
+            "preLaunchTask": "make macos",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/starcraft",
@@ -63,7 +55,7 @@
                 },
                 {
                     "description": "Add debug symbol search path",
-                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/zig-out/lib",
+                    "text": "settings append target.debug-file-search-paths ${workspaceFolder}/build",
                     "ignoreFailures": true
                 },
                 {
@@ -73,11 +65,11 @@
                 },
                 {
                     "description": "Load liboscar dSYM bundle",
-                    "text": "target symbols add ${workspaceFolder}/zig-out/lib/liboscar.dylib.dSYM",
+                    "text": "target symbols add ${workspaceFolder}/build/liboscar.dylib.dSYM",
                     "ignoreFailures": true
                 }
             ],
-            "additionalSOLibSearchPath": "${workspaceFolder}/zig-out/lib"
+            "additionalSOLibSearchPath": "${workspaceFolder}/build"
         }
     ]
 }

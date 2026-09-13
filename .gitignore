@@ -1,8 +1,9 @@
 starcraft/**
-zig-cache/**
-zig-out/**
+build/**
 .DS_Store
 lib/*.so
 lib/*.dylib
 bwapi/**
+zig-cache/**
 .zig-cache/**
+zig-out/**
