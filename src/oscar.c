@@ -2,14 +2,12 @@
 
 #include "events.h"
 
-static void draw_debug_info(Game* broodwar)
-{
-    CoordinateType coord_none = { 0 };
+static void draw_debug_info(Game *broodwar) {
+    CoordinateType coord_none = {0};
     Game_drawText(broodwar, coord_none, 10, 10, "Frame %d", Game_getFrameCount(broodwar));
 }
 
-void oscar_on_frame(Game* broodwar, GameState* gs)
-{
+void oscar_on_frame(Game *broodwar, GameState *gs) {
     UnitEventVec new_events = {0};
 
     draw_debug_info(broodwar);
