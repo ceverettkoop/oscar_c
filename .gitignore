@@ -7,3 +7,4 @@ bwapi/**
 zig-cache/**
 .zig-cache/**
 zig-out/**
+compile_commands.json
